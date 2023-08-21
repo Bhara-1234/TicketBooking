@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<style>
+table{
+width:100%;
+border:1px solid;
+border-collapse:collapse;
+
+}
+tr,th,td,tbody{
+border:1px solid;
+border-collapse:collapse;
+
+}
+	form{
+		width:700px;
+		height:100%;
+				
+				
+	}
+	#submit{
+				 
+		 border-color: solidblack;
+		 color: solidblack;
+  		 padding: 10px 25px;
+  		 text-align: center;
+  		 text-decoration: none;
+  		 display: inline-block;
+  		 font-size: 16px;
+ 		 margin: 4px 2px;
+  		 cursor: pointer;
+	}
+	#lst{
+		padding-right:95px;
+	}
+	form{
+		background-image:url("");
+				
+		}
+</style>
+</head>
+
+<body>
+	<div align="center" class="container">
+		<form action="http://localhost:8088/TicketBooking/Book" method="GET">
+		
+		<h1 align="center">TICKET BOOKING</h1><br><br>
+		<label>FROM :  </label><input list="ls" name="from"><datalist id="ls"></datalist>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<label>TO :  </label><input list="ls1" name="to"><datalist id="ls1" ></datalist><br><br><br>
+		<label id="lab">TRAIN NAME :</label>
+		<input list="ls3" name="train"><datalist id="ls3"><option>CORAMANDAL EXPRESS</option><option>TIRUMULA EXPRESS</option><option>PURI EXPRESS</option><option>CHENNAI CENTRAL</option></datalist>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<label>DATE :  </label>
+		<input type="date" id="ls4" style="width:150px" name="date"><br><br><br>
+		<div id="lst">
+					
+		<label>CLASS :  </label>
+		<input list="ls5" name="clas"><datalist id="ls5"><option>FIRSTCLASS</option><option>SECONDCLASS</option><option>SLEEPER</option><option>AC</option></datalist>
+		</div><input type="hidden" id="tableData" name="psss" value="">
+
+		<br><br><br>
+<div align='left'>
+        <h3>PASSENGERS</h3>
+    </div>
+    <br>
+    <div class="container">
+		
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th>SL.No</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Berth</th>
+                </tr>
+            </thead>
+            <tbody id="pass">
+            </tbody>
+        </table>
+        
+        <br><br>
+    </div>
+    <input type="submit" class="btn btn-primary" value="BOOK" style="padding: 10px 25px;">
+</form>
+<button id="book" style="font-style:italic;font-weight:bold" onclick="add()">ADD</button>
+</div>
+
+<script>
+
+		const fromList=document.getElementById("ls");
+		const toList=document.getElementById("ls1");
+		const trainList=document.getElementById("ls3");
+
+		var xhr=new XMLHttpRequest();
+		
+		xhr.open("GET","http://localhost:8088/TicketBooking/Book",true);
+		
+		xhr.onreadystatechange=function(){
+		
+			if(xhr.readyState===4&&xhr.status===200){
+				
+				console.log(xhr.responseText);
+				var res=JSON.parse(xhr.responseText);
+				console.log(res);
+				var trainsList=res.train;
+				var placeList=res.place;
+				for(var i=0;i<placeList.length;i++){
+					const fromOption = document.createElement("option");
+		            fromOption.value = placeList[i];
+		            fromList.appendChild(fromOption);
+
+		            const toOption = document.createElement("option");
+		            toOption.value = placeList[i];
+		            toList.appendChild(toOption);
+				}
+				
+				for(var i=0;i<trainsList.length;i++){
+					const trainOption = document.createElement("option");
+		            trainOption.value = trainsList[i];
+		            trainList.appendChild(trainOption);
+				}
+			}
+			
+		};
+		
+		xhr.send();
+
+
+
+
+	const tableBody = document.getElementById("pass");
+let count = 1;
+function add() {
+    if (count < 5) {
+        const newRow = document.createElement("tr");
+
+        const slnoCell = document.createElement("td");
+	slnoCell.textContent = count; 
+	
+newRow.appendChild(slnoCell);
+        const nameCell = document.createElement("td");
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.placeholder = "Enter name";
+        nameCell.appendChild(nameInput);
+        newRow.appendChild(nameCell);
+
+        const genderCell = document.createElement("td");
+        const genderInput = document.createElement("select");
+        const optionMale = document.createElement("option");
+	optionMale.value = "male";
+	optionMale.textContent = "Male";
+	genderInput.appendChild(optionMale);
+
+	const optionFemale = document.createElement("option");
+	optionFemale.value = "female";
+	optionFemale.textContent = "Female";
+	genderInput.appendChild(optionFemale);
+        genderCell.appendChild(genderInput);
+        newRow.appendChild(genderCell);
+
+        const ageCell = document.createElement("td");
+        const ageInput = document.createElement("input");
+        ageInput.type = "text";
+        ageInput.placeholder = "Enter age";
+        ageCell.appendChild(ageInput);
+        newRow.appendChild(ageCell);
+
+        const berthCell = document.createElement("td");
+        const berthInput = document.createElement("select");
+        const low = document.createElement("option");
+	low.value = "Lower";
+	low.textContent = "Lower";
+	berthInput.appendChild(low);
+
+	const mid = document.createElement("option");
+	mid.value = "Middle";
+	mid.textContent = "Middle";
+	berthInput.appendChild(mid);
+
+	const up = document.createElement("option");
+	up.value = "Upper";
+	up.textContent = "Upper";
+	berthInput.appendChild(up);
+        berthCell.appendChild(berthInput);
+        newRow.appendChild(berthCell);
+
+        tableBody.appendChild(newRow);
+
+        count++;
+    }
+    updateTableData();
+}
+
+function updateTableData() {
+    const tableRows = Array.from(tableBody.querySelectorAll("tr"));
+    const rowData = [];
+
+    for (const row of tableRows) {
+        const cells = row.querySelectorAll("td");
+        const rowDataEntry = {
+            slno: cells[0].textContent,
+            name: cells[1].querySelector("input").value,
+            gender: cells[2].querySelector("select").value,
+            age: cells[3].querySelector("input").value,
+            berth: cells[4].querySelector("select").value
+        };
+        rowData.push(rowDataEntry);
+    }
+
+    const tableDataInput = document.getElementById("tableData");
+    tableDataInput.value = JSON.stringify(rowData);
+}
+
+</script>
+</body>
+
+</html>
